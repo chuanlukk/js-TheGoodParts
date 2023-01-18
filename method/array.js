@@ -68,3 +68,149 @@ a.sort(function (a, b){
 });
 console.log(a);//[2,34,43,98,555]
 // 更复杂的排序
+var m = ['aa', 'bb', 'a', 4, 8, 15, 16, 23, 42, 'A', 'Aa'];
+m.sort(function (a, b){
+    if(a === b){
+        return 0;
+    }
+    if(typeof a === typeof b){
+        return a < b ? -1 : 1;
+    }
+    return typeof a < typeof b ? -1 : 1;
+});
+console.log(m);//[4, 8, 15, 16, 23, 42, 'A', 'Aa', 'a', 'aa', 'bb']
+// 对对象数组的排序
+// by函数接受一个成员名字字符串作为参数，
+// 并返回一个可以用来对包含该成员的对象数组进行排序的比较函数
+var by = function(name){
+    return function (o, p) {
+        var a, b;
+        if(typeof o === 'object' && typeof p === 'object' && o && p){
+            a = o[name];
+            b = p[name];
+            if(a === b){
+                return 0;
+            }
+            if(typeof a === typeof b){
+                return a < b ? -1 : 1;
+            }
+            return typeof a < typeof b ? -1 : 1;
+        } else {
+            throw {
+                name: 'Error',
+                message: 'Expected an object when sorting by ' + name
+            };
+        }
+    };
+};
+var s = [
+    {first: 'Joe', last: 'Besser'},
+    {first: 'Moe', last: 'Howard'},
+    {first: 'Joe', last: 'DeRita'},
+    {first: 'Shemp', last: 'Howard'},
+    {first: 'Larry', last: 'Fine'},
+    {first: 'Curly', last: 'Howard'},
+];
+s.sort(by('first'));
+console.log(s);
+/*
+[
+    {
+        "first": "Curly",
+        "last": "Howard"
+    },
+    {
+        "first": "Joe",
+        "last": "Besser"
+    },
+    {
+        "first": "Joe",
+        "last": "DeRita"
+    },
+    {
+        "first": "Larry",
+        "last": "Fine"
+    },
+    {
+        "first": "Moe",
+        "last": "Howard"
+    },
+    {
+        "first": "Shemp",
+        "last": "Howard"
+    }
+] 
+*/
+// 如果想基于多个键值进行排序，需要修改by函数，让其可以接受两个参数
+// 当主要键值相等时，另一个compare方法将被调用以决高下
+// minor时另一个compare函数
+var by = function (name, minor){
+    return function (o, p) {
+        var a, b;
+        if(o && p && typeof o === 'object' && typeof p === 'object'){
+            a = o[name];
+            b = p[name];
+            if(a === b){//使用第二个compare函数
+                // ！此处的minor(o, p)是minor()返回出来的
+                return typeof minor === 'function' ? minor(o, p) : 0;
+            }
+            if(typeof a === typeof b){
+                return a < b ? -1 : 1;
+            }
+            return typeof a < typeof b ? -1 : 1;
+        }else{
+            throw {
+                name: 'Error',
+                message: 'Expected an object when sorting by ' + name
+            };
+        }
+    };
+};
+s.sort(by('last', by('first')));
+console.log(s);
+/*
+[
+    {
+        "first": "Joe",
+        "last": "Besser"
+    },
+    {
+        "first": "Joe",
+        "last": "DeRita"
+    },
+    {
+        "first": "Larry",
+        "last": "Fine"
+    },
+    {
+        "first": "Curly",
+        "last": "Howard"
+    },
+    {
+        "first": "Moe",
+        "last": "Howard"
+    },
+    {
+        "first": "Shemp",
+        "last": "Howard"
+    }
+]
+*/
+
+// array.splice(start, deleteCount, item...)
+// 该方法从array中移除一个或多个元素，并用新的item替换他们。
+// 返回一个包含被移除元素的数组
+// 前面的slice方法主要作用是浅复制，此处splice主要作用是从数组中删除元素
+var a = ['a', 'b', 'c'];
+var r = a.splice(1, 1, 'ache', 17);
+console.log(a);//['a', 'ache', 17, 'c']
+console.log(r);//['b']
+// splice方法的手动实现请翻阅书籍Page-83
+
+// array.unshift(item...)
+// 与push一样，把元素添加到数组中，不同的是unshift把item插入到开始部分
+// 返回array的新length
+var a = ['a', 'b', 'c'];
+var r = a.unshift('?', 666);
+console.log(a);//['?', 666, 'a', 'b', 'c']
+console.log(r);//5
